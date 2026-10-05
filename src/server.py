@@ -18,9 +18,12 @@ app = FastAPI(title="VIT Underpass Intelligent Traffic Supervisory Terminal")
 
 BASE_DIR = os.path.dirname(__file__)
 UPLOAD_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "uploads"))
+FRONTEND_DIST = os.path.abspath(os.path.join(BASE_DIR, "..", "frontend", "dist"))
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+if os.path.exists(os.path.join(FRONTEND_DIST, "assets")):
+    app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIST, "assets")), name="assets")
 
 detector = TrafficDetector()
 detector.load_model()
@@ -40,8 +43,11 @@ async def startup_event():
     init_db()
     serial_bridge.connect()
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
 async def get_dashboard(request: Request):
+    index_path = os.path.join(FRONTEND_DIST, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
     return templates.TemplateResponse(request=request, name="index.html")
 
 

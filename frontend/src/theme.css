@@ -1,0 +1,210 @@
+/* NEO-BRUTALIST FUTURISTIC TRAFFIC CONTROL DASHBOARD THEME */
+:root {
+  /* Brand Palette Constants */
+  --royal-plum: #593C8F;
+  --royal-plum-dark: #3B2663;
+  --royal-plum-light: #7A56BF;
+  --mint-mist: #A8D5BA;
+  --mint-mist-glow: rgba(168, 213, 186, 0.4);
+  --vanilla-cream: #FAF6EE;
+  
+  /* Signal Universal Safety Lights (NEVER CHANGE MEANING) */
+  --signal-red: #FF3B30;
+  --signal-red-glow: rgba(255, 59, 48, 0.6);
+  --signal-amber: #FFCC00;
+  --signal-amber-glow: rgba(255, 204, 0, 0.6);
+  --signal-green: #34C759;
+  --signal-green-glow: rgba(52, 199, 89, 0.6);
+
+  /* Dark Theme Default Variables */
+  --bg-dark: #0A0612;
+  --bg-panel: #140C24;
+  --bg-card: #1D1233;
+  --bg-hover: #2A1B4A;
+  
+  --text-main: #FAF6EE;
+  --text-sub: #A8D5BA;
+  --text-muted: #7E749C;
+
+  --border-color: #593C8F;
+  --border-glow: #A8D5BA;
+
+  /* Brutalist Shadows & Edges */
+  --shadow-brutal: 4px 4px 0px #000000;
+  --shadow-brutal-hover: 6px 6px 0px #000000;
+  --shadow-brutal-plum: 4px 4px 0px #593C8F;
+  --shadow-brutal-mint: 4px 4px 0px #A8D5BA;
+
+  --font-head: 'Space Grotesk', 'Rajdhani', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+}
+
+[data-theme="light"] {
+  --bg-dark: #FAF6EE;
+  --bg-panel: #F0E8D9;
+  --bg-card: #FFFFFF;
+  --bg-hover: #E4D8C4;
+
+  --text-main: #140C24;
+  --text-sub: #3B2663;
+  --text-muted: #6B5B88;
+
+  --border-color: #593C8F;
+  --border-glow: #3B2663;
+
+  --shadow-brutal: 4px 4px 0px #140C24;
+  --shadow-brutal-hover: 6px 6px 0px #140C24;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-head);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Neo-Brutalist HUD Panel Frame */
+.hud-panel {
+  background-color: var(--bg-panel);
+  border: 2px solid var(--border-color);
+  box-shadow: var(--shadow-brutal);
+  position: relative;
+  border-radius: 4px;
+  padding: 16px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.hud-panel::before, .hud-panel::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--mint-mist);
+  pointer-events: none;
+}
+.hud-panel::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+.hud-panel::after { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+/* Brutalist Button Styling */
+.btn-brutal {
+  background-color: var(--royal-plum);
+  color: var(--vanilla-cream);
+  border: 2px solid #000;
+  box-shadow: var(--shadow-brutal);
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 10px 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.1s ease;
+  user-select: none;
+}
+
+.btn-brutal:hover {
+  background-color: var(--royal-plum-light);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-brutal-hover);
+}
+
+.btn-brutal:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #000;
+}
+
+.btn-danger {
+  background-color: var(--signal-red);
+  color: #FFF;
+}
+.btn-danger:hover {
+  background-color: #E02D22;
+}
+
+.btn-mint {
+  background-color: var(--mint-mist);
+  color: #0A0612;
+}
+.btn-mint:hover {
+  background-color: #BCDFC9;
+}
+
+.btn-secondary {
+  background-color: var(--bg-hover);
+  color: var(--text-main);
+  border-color: var(--border-color);
+}
+
+/* Status Badges */
+.badge-brutal {
+  border: 2px solid #000;
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 2px 2px 0px #000;
+  text-transform: uppercase;
+}
+
+.badge-connected {
+  background-color: var(--signal-green);
+  color: #000;
+}
+
+.badge-disconnected {
+  background-color: var(--signal-red);
+  color: #FFF;
+}
+
+.badge-sim {
+  background-color: var(--royal-plum);
+  color: var(--vanilla-cream);
+}
+
+.badge-mint {
+  background-color: var(--mint-mist);
+  color: #0A0612;
+}
+
+/* Pulsing dot for hardware/live status */
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+  animation: pulse-glow 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--royal-plum);
+  border: 1px solid var(--mint-mist);
+}

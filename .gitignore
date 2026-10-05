@@ -25,7 +25,7 @@ dataset/
 
 # Frontend Node Modules & Builds
 frontend/node_modules/
-frontend/dist/
+# frontend/dist is included so FastAPI serves built React SPA cleanly
 frontend/build/
 .next/
 
