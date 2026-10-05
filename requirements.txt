@@ -1,0 +1,22 @@
+# Core Computer Vision & AI
+torch>=2.0.0
+torchvision>=0.15.0
+ultralytics>=8.1.0
+opencv-python>=4.8.0
+pillow>=10.0.0
+numpy>=1.24.0
+
+# Web UI Backend & Real-time Server
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+websockets>=12.0
+python-multipart>=0.0.6
+pydantic>=2.5.0
+
+# Hardware Communication
+pyserial>=3.5
+
+# Data & Utilities
+pyyaml>=6.0
+matplotlib>=3.7.0
+pandas>=2.0.0

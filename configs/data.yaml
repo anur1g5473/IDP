@@ -1,0 +1,17 @@
+# YOLO Dataset Configuration for VIT Underpass Traffic Controller
+
+path: ../training/dataset  # Dataset root directory relative to IDP repo
+train: images/train        # Train images
+val: images/val            # Validation images
+test: images/test          # Held-out test set
+
+# Classes
+names:
+  0: person
+  1: bicycle
+  2: car
+  3: motorcycle
+  4: bus
+  5: truck
+  6: auto_rickshaw
+  7: ambulance

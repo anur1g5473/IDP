@@ -1,0 +1,39 @@
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# PyTorch & YOLO Outputs
+*.pt
+*.onnx
+*.engine
+runs/
+wandb/
+*.log
+
+# Datasets and Media (Managed outside repo)
+../training/
+data/
+videos/
+dataset/
+
+# Frontend Node Modules & Builds
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+.next/
+
+# System Files
+.DS_Store
+Thumbs.db
+*.swp
+
+# IDE Settings
+.vscode/
+.idea/

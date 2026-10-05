@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIT Underpass Traffic Control Terminal</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #FAF6EE;
+            --purple: #593C8F;
+            --green: #A8D5BA;
+            --dark-card: #1A1A24;
+            --accent-green: #2ecc71;
+            --accent-red: #e74c3c;
+            --accent-yellow: #f1c40f;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121218;
+            color: #FAF6EE;
+        }
+
+        .header {
+            background-color: var(--purple);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            height: calc(100vh - 80px);
+            box-sizing: border-box;
+        }
+
+        .card {
+            background-color: var(--dark-card);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #digital-twin-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            background-color: #0d0d12;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .badge-green { background-color: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid #2ecc71; }
+        .badge-red { background-color: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; }
+
+        .btn {
+            background-color: var(--purple);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover { background-color: #462e73; }
+        .btn-danger { background-color: #c0392b; }
+        .btn-danger:hover { background-color: #a93226; }
+
+        .telemetry-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>VIT UNDERPASS AUTOMATED TRAFFIC CONTROLLER</h1>
+        <div id="hardware-status" class="status-badge badge-red">HW: DISCONNECTED (SIMULATION)</div>
+    </div>
+
+    <script>
+        const container = document.getElementById('digital-twin-canvas');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0d0d12);
+
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(0, 25, 35);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        const roadGeo = new THREE.PlaneGeometry(12, 50);
+        const roadMat = new THREE.MeshBasicMaterial({ color: 0x2c3e50, side: THREE.DoubleSide });
+        const road = new THREE.Mesh(roadGeo, roadMat);
+        road.rotation.x = Math.PI / 2;
+        scene.add(road);
+
+        const sigAGeo = new THREE.SphereGeometry(1.5, 16, 16);
+        const sigAMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const signalA = new THREE.Mesh(sigAGeo, sigAMat);
+        signalA.position.set(-8, 3, -20);
+        scene.add(signalA);
+
+        const sigBGeo = new THREE.SphereGeometry(1.5, 16, 16);
+        const sigBMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const signalB = new THREE.Mesh(sigBGeo, sigBMat);
+        signalB.position.set(8, 3, 20);
+        scene.add(signalB);
+
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(10, 20, 10);
+        scene.add(light);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        const ws = new WebSocket(`ws://${location.host}/ws/telemetry`);
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            const dec = data.decision;
+
+            document.getElementById('fsm-state').innerText = dec.fsm_state;
+            document.getElementById('side-a-sig').innerText = dec.side_a_signal;
+            document.getElementById('side-b-sig').innerText = dec.side_b_signal;
+            document.getElementById('elapsed-time').innerText = dec.elapsed_seconds + " s";
+
+            signalA.material.color.setHex(dec.side_a_signal === 'GREEN' ? 0x2ecc71 : 0xe74c3c);
+            signalB.material.color.setHex(dec.side_b_signal === 'GREEN' ? 0x2ecc71 : 0xe74c3c);
+
+            const hwStatus = document.getElementById('hardware-status');
+            if (data.hardware_connected) {
+                hwStatus.innerText = "HW: ESP32 CONNECTED (COM3)";
+                hwStatus.className = "status-badge badge-green";
+            } else {
+                hwStatus.innerText = "HW: DISCONNECTED (SIMULATION)";
+                hwStatus.className = "status-badge badge-red";
+            }
+        };
+
+        function sendOverride(mode) {
+            fetch(`/api/override/${mode}`, { method: 'POST' });
+        }
+    </script>
+</body>
+</html>
+
+    <div class="dashboard-grid">
+        <div class="card">
+            <h3>3D DIGITAL TWIN (VIT SINGLE-LANE UNDERPASS)</h3>
+            <div id="digital-twin-canvas"></div>
+        </div>
+
+        <div class="card">
+            <h3>SUPERVISORY CONTROL</h3>
+            <div class="telemetry-row">
+                <span>FSM State:</span>
+                <strong id="fsm-state" style="color: var(--accent-yellow);">INIT</strong>
+            </div>
+            <div class="telemetry-row">
+                <span>Side A Signal:</span>
+                <strong id="side-a-sig">RED</strong>
+            </div>
+            <div class="telemetry-row">
+                <span>Side B Signal:</span>
+                <strong id="side-b-sig">RED</strong>
+            </div>
+            <div class="telemetry-row">
+                <span>Elapsed State Time:</span>
+                <strong id="elapsed-time">0.0 s</strong>
+            </div>
+
+            <h4 style="margin-top:20px;">GUARD MANUAL OVERRIDES</h4>
+            <button class="btn" onclick="sendOverride('SIDE_A')">Force Side A Green</button>
+            <button class="btn" onclick="sendOverride('SIDE_B')">Force Side B Green</button>
+            <button class="btn btn-danger" onclick="sendOverride('ALL_RED')">Emergency All Red</button>
+            <button class="btn" style="background:#7f8c8d;" onclick="sendOverride('RESET')">Reset Automatic AI Mode</button>
+        </div>
+    </div>

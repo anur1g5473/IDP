@@ -1,0 +1,31 @@
+{
+  "project_name": "VIT Underpass Traffic Controller",
+  "version": "1.0.0",
+  "detection": {
+    "model_size": "yolo11n.pt",
+    "conf_threshold": 0.45,
+    "iou_threshold": 0.50,
+    "img_size": 640,
+    "classes": {
+      "0": "person",
+      "1": "bicycle",
+      "2": "car",
+      "3": "motorcycle",
+      "5": "bus",
+      "7": "truck",
+      "8": "auto_rickshaw",
+      "9": "ambulance"
+    }
+  },
+  "decision_engine": {
+    "min_green_time_sec": 10,
+    "max_green_time_sec": 45,
+    "clearance_time_sec": 4,
+    "starvation_threshold_sec": 40
+  },
+  "hardware": {
+    "port": "COM3",
+    "baud_rate": 115200,
+    "watchdog_timeout_sec": 3
+  }
+}
