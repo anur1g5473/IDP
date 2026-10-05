@@ -3,150 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIT Underpass Traffic Control Terminal</title>
+    <title>VIT Underpass Traffic Supervisory Console</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
-            --bg-primary: #FAF6EE;
-            --purple: #593C8F;
-            --green: #A8D5BA;
-            --dark-card: #1A1A24;
+            --bg-dark: #0f111a;
+            --card-bg: #181b29;
+            --purple-main: #6c5ce7;
+            --purple-hover: #5b4bc4;
             --accent-green: #2ecc71;
             --accent-red: #e74c3c;
             --accent-yellow: #f1c40f;
+            --accent-blue: #3498db;
+            --text-main: #f1f2f6;
+            --text-sub: #a4b0be;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121218;
-            color: #FAF6EE;
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
         }
 
         .header {
-            background-color: var(--purple);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            background-color: var(--card-bg);
+            padding: 12px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--purple-main);
         }
 
-        .header h1 {
-            margin: 0;
-            font-size: 1.4rem;
-            letter-spacing: 1px;
-        }
+        .header h1 { margin: 0; font-size: 1.2rem; }
 
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-            padding: 20px;
-            height: calc(100vh - 80px);
-            box-sizing: border-box;
+        .nav-tabs { display: flex; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px; gap: 4px; }
+        .tab-btn {
+            background: transparent; border: none; color: var(--text-sub);
+            padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem;
         }
+        .tab-btn.active { background: var(--purple-main); color: #fff; }
 
-        .card {
-            background-color: var(--dark-card);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.05);
-            display: flex;
-            flex-direction: column;
-        }
+        .status-badge { padding: 4px 12px; border-radius: 12px; font-weight: bold; font-size: 0.75rem; }
+        .badge-green { background: rgba(46,204,113,0.15); color: #2ecc71; border: 1px solid #2ecc71; }
+        .badge-red { background: rgba(231,76,60,0.15); color: #e74c3c; border: 1px solid #e74c3c; }
+        .badge-blue { background: rgba(52,152,219,0.15); color: #3498db; border: 1px solid #3498db; }
 
-        #digital-twin-canvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 8px;
-            background-color: #0d0d12;
-        }
+        .tab-content { display: none; padding: 16px; }
+        .tab-content.active { display: block; }
 
-        .status-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-        }
+        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+        .card { background-color: var(--card-bg); border-radius: 8px; padding: 16px; border: 1px solid rgba(255,255,255,0.06); }
+        .card-title { margin-top: 0; margin-bottom: 12px; font-size: 1rem; color: var(--purple-main); display: flex; justify-content: space-between; }
 
-        .badge-green { background-color: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid #2ecc71; }
-        .badge-red { background-color: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; }
+        .video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .video-box { background: #000; border-radius: 6px; overflow: hidden; position: relative; aspect-ratio: 4/3; }
+        .video-box img { width: 100%; height: 100%; object-fit: cover; }
+        .video-overlay { position: absolute; top: 6px; left: 6px; background: rgba(0,0,0,0.7); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
+
+        #digital-twin-canvas { width: 100%; height: 220px; border-radius: 6px; background-color: #08090d; }
 
         .btn {
-            background-color: var(--purple);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 10px;
-            transition: background 0.2s;
+            background-color: var(--purple-main); color: white; border: none;
+            padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem;
+            width: 100%; margin-top: 6px;
         }
-
-        .btn:hover { background-color: #462e73; }
+        .btn:hover { background-color: var(--purple-hover); }
         .btn-danger { background-color: #c0392b; }
-        .btn-danger:hover { background-color: #a93226; }
+        .btn-secondary { background-color: #4b6584; }
 
-        .telemetry-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
+        .telemetry-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.85rem; }
+        .upload-area { border: 2px dashed rgba(255,255,255,0.2); padding: 25px; border-radius: 8px; text-align: center; cursor: pointer; background: rgba(0,0,0,0.2); }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        th { background: rgba(0,0,0,0.4); color: var(--purple-main); }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+        .stat-card { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; border-left: 3px solid var(--purple-main); }
+        .stat-val { font-size: 1.4rem; font-weight: bold; color: #fff; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>VIT UNDERPASS AUTOMATED TRAFFIC CONTROLLER</h1>
+        <h1>🚦 VIT UNDERPASS SUPERVISORY DASHBOARD</h1>
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab(event, 'tab-live')">Dual Live & 3D Twin</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-single')">Single Media Test</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-db')">Database Logs</button>
+        </div>
         <div id="hardware-status" class="status-badge badge-red">HW: DISCONNECTED (SIMULATION)</div>
     </div>
 
+
+    <!-- TAB 1: DUAL LIVE & 3D TWIN -->
+    <div id="tab-live" class="tab-content active">
+        <div class="dashboard-grid">
+            <div>
+                <div class="card" style="margin-bottom: 12px;">
+                    <div class="card-title">
+                        <span>LIVE UNDERPASS CAMERAS (YOLO DETECTORS)</span>
+                        <span id="dual-sim-badge" class="status-badge badge-blue">SIMULATION IDLE</span>
+                    </div>
+                    <div class="video-grid">
+                        <div class="video-box">
+                            <div class="video-overlay">SIDE A (CAMPUS WEST)</div>
+                            <img id="feed-a" src="/api/video_feed/a" alt="Side A Feed" />
+                        </div>
+                        <div class="video-box">
+                            <div class="video-overlay">SIDE B (CAMPUS EAST)</div>
+                            <img id="feed-b" src="/api/video_feed/b" alt="Side B Feed" />
+                        </div>
+                    </div>
+                    <form id="dual-upload-form" style="display:flex; gap:8px; align-items:center;">
+                        <input type="file" id="dual-file-a" accept="video/*" required style="font-size:0.75rem;" />
+                        <input type="file" id="dual-file-b" accept="video/*" required style="font-size:0.75rem;" />
+                        <button type="submit" class="btn" style="width:auto; margin-top:0;">Start Dual Test</button>
+                        <button type="button" class="btn btn-secondary" onclick="stopDualSimulation()" style="width:auto; margin-top:0;">Stop</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">3D DIGITAL TWIN (VIT UNDERPASS)</div>
+                    <div id="digital-twin-canvas"></div>
+                </div>
+            </div>
+
+            <div>
+                <div class="card">
+                    <div class="card-title">FSM DECISION ENGINE</div>
+                    <div class="telemetry-row"><span>Current FSM State:</span><strong id="fsm-state" style="color: var(--accent-yellow);">INIT</strong></div>
+                    <div class="telemetry-row"><span>Side A Signal:</span><strong id="side-a-sig">RED</strong></div>
+                    <div class="telemetry-row"><span>Side B Signal:</span><strong id="side-b-sig">RED</strong></div>
+                    <div class="telemetry-row"><span>Elapsed State Time:</span><strong id="elapsed-time">0.0 s</strong></div>
+                    <div class="telemetry-row"><span>Side A Vehicles:</span><strong id="side-a-count">0</strong></div>
+                    <div class="telemetry-row"><span>Side B Vehicles:</span><strong id="side-b-count">0</strong></div>
+
+                    <h4 style="margin-top:14px; margin-bottom:6px; color: var(--text-sub); font-size:0.9rem;">MANUAL OVERRIDES</h4>
+                    <button class="btn" onclick="sendOverride('SIDE_A')">Force Side A Green</button>
+                    <button class="btn" onclick="sendOverride('SIDE_B')">Force Side B Green</button>
+                    <button class="btn btn-danger" onclick="sendOverride('ALL_RED')">Emergency All Red</button>
+                    <button class="btn btn-secondary" onclick="sendOverride('RESET')">Reset Automatic AI Mode</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: SINGLE MEDIA TEST -->
+    <div id="tab-single" class="tab-content">
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-title">SINGLE IMAGE / VIDEO TEST</div>
+                <div class="upload-area" onclick="document.getElementById('single-file-input').click()">
+                    <p style="margin:0; font-size:1rem; color:var(--purple-main);">📁 Click or Drop File Here to Analyze</p>
+                    <p style="margin:4px 0 0 0; font-size:0.75rem; color:var(--text-sub);">Supports .jpg, .png, .mp4</p>
+                    <input type="file" id="single-file-input" style="display:none;" onchange="handleSingleUpload(this.files)" />
+                </div>
+                <div id="single-result-container" style="margin-top:12px; display:none;">
+                    <div style="background:#000; border-radius:6px; overflow:hidden;">
+                        <img id="single-result-img" src="" style="width:100%; display:block;" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">DETECTION BREAKDOWN</div>
+                <div id="single-breakdown">
+                    <p style="color:var(--text-sub); font-size:0.85rem;">Upload an image/video to view detection breakdown.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: DATABASE LOGS -->
+    <div id="tab-db" class="tab-content">
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div style="color:var(--text-sub); font-size:0.8rem;">Total Events Logged</div>
+                <div id="stat-total-logs" class="stat-val">0</div>
+            </div>
+            <div class="stat-card">
+                <div style="color:var(--text-sub); font-size:0.8rem;">Total Vehicles Processed</div>
+                <div id="stat-total-vehicles" class="stat-val">0</div>
+            </div>
+            <div class="stat-card">
+                <div style="color:var(--text-sub); font-size:0.8rem;">Emergency Events</div>
+                <div id="stat-emergency-count" class="stat-val">0</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span>RECENT TRAFFIC LOGS (SQLite)</span>
+                <button class="btn" style="width:auto; margin-top:0;" onclick="loadDatabaseLogs()">Refresh</button>
+            </div>
+            <div style="max-height: 400px; overflow-y: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>FSM State</th>
+                            <th>Signal A</th>
+                            <th>Signal B</th>
+                            <th>Count A</th>
+                            <th>Count B</th>
+                            <th>Emergency</th>
+                            <th>Override</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logs-table-body">
+                        <tr><td colspan="8" style="text-align:center;">Loading logs...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
     <script>
+        function switchTab(evt, tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            evt.currentTarget.classList.add('active');
+            if (tabId === 'tab-db') loadDatabaseLogs();
+        }
+
         const container = document.getElementById('digital-twin-canvas');
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0d0d12);
+        scene.background = new THREE.Color(0x08090d);
 
         const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        camera.position.set(0, 25, 35);
+        camera.position.set(0, 30, 40);
         camera.lookAt(0, 0, 0);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(renderer.domElement);
 
-        const roadGeo = new THREE.PlaneGeometry(12, 50);
-        const roadMat = new THREE.MeshBasicMaterial({ color: 0x2c3e50, side: THREE.DoubleSide });
-        const road = new THREE.Mesh(roadGeo, roadMat);
-        road.rotation.x = Math.PI / 2;
-        scene.add(road);
+        const roadGeo = new THREE.BoxGeometry(6, 0.2, 40);
+        const roadMat = new THREE.MeshBasicMaterial({ color: 0x333344 });
+        scene.add(new THREE.Mesh(roadGeo, roadMat));
 
-        const sigAGeo = new THREE.SphereGeometry(1.5, 16, 16);
-        const sigAMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        const signalA = new THREE.Mesh(sigAGeo, sigAMat);
-        signalA.position.set(-8, 3, -20);
+        const signalA = new THREE.Mesh(new THREE.SphereGeometry(1.2, 16, 16), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+        signalA.position.set(-5, 2, -15);
         scene.add(signalA);
 
-        const sigBGeo = new THREE.SphereGeometry(1.5, 16, 16);
-        const sigBMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        const signalB = new THREE.Mesh(sigBGeo, sigBMat);
-        signalB.position.set(8, 3, 20);
+        const signalB = new THREE.Mesh(new THREE.SphereGeometry(1.2, 16, 16), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+        signalB.position.set(5, 2, 15);
         scene.add(signalB);
 
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(10, 20, 10);
-        scene.add(light);
-
-        function animate() {
-            requestAnimationFrame(animate);
-            renderer.render(scene, camera);
-        }
+        function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
         animate();
 
         const ws = new WebSocket(`ws://${location.host}/ws/telemetry`);
@@ -155,12 +257,16 @@
             const dec = data.decision;
 
             document.getElementById('fsm-state').innerText = dec.fsm_state;
-            document.getElementById('side-a-sig').innerText = dec.side_a_signal;
-            document.getElementById('side-b-sig').innerText = dec.side_b_signal;
-            document.getElementById('elapsed-time').innerText = dec.elapsed_seconds + " s";
+            document.getElementById('side-a-sig').innerText = dec.signal_side_a || dec.side_a_signal || "RED";
+            document.getElementById('side-b-sig').innerText = dec.signal_side_b || dec.side_b_signal || "RED";
+            document.getElementById('elapsed-time').innerText = (dec.elapsed_seconds || 0).toFixed(1) + " s";
+            document.getElementById('side-a-count').innerText = data.side_a.total_vehicles || 0;
+            document.getElementById('side-b-count').innerText = data.side_b.total_vehicles || 0;
 
-            signalA.material.color.setHex(dec.side_a_signal === 'GREEN' ? 0x2ecc71 : 0xe74c3c);
-            signalB.material.color.setHex(dec.side_b_signal === 'GREEN' ? 0x2ecc71 : 0xe74c3c);
+            const sigAColor = (dec.signal_side_a === 'GREEN' || dec.side_a_signal === 'GREEN') ? 0x2ecc71 : 0xe74c3c;
+            const sigBColor = (dec.signal_side_b === 'GREEN' || dec.side_b_signal === 'GREEN') ? 0x2ecc71 : 0xe74c3c;
+            signalA.material.color.setHex(sigAColor);
+            signalB.material.color.setHex(sigBColor);
 
             const hwStatus = document.getElementById('hardware-status');
             if (data.hardware_connected) {
@@ -170,44 +276,73 @@
                 hwStatus.innerText = "HW: DISCONNECTED (SIMULATION)";
                 hwStatus.className = "status-badge badge-red";
             }
+
+            const simBadge = document.getElementById('dual-sim-badge');
+            if (data.dual_sim_active) {
+                simBadge.innerText = "DUAL VIDEO TEST RUNNING";
+                simBadge.className = "status-badge badge-green";
+            } else {
+                simBadge.innerText = "SIMULATION IDLE";
+                simBadge.className = "status-badge badge-blue";
+            }
         };
 
-        function sendOverride(mode) {
-            fetch(`/api/override/${mode}`, { method: 'POST' });
+        function sendOverride(mode) { fetch(`/api/override/${mode}`, { method: 'POST' }); }
+        document.getElementById('dual-upload-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('file_a', document.getElementById('dual-file-a').files[0]);
+            formData.append('file_b', document.getElementById('dual-file-b').files[0]);
+            const res = await fetch('/api/upload/dual', { method: 'POST', body: formData });
+            const result = await res.json();
+            if(result.status === 'ok') {
+                document.getElementById('feed-a').src = result.side_a_feed + '?' + new Date().getTime();
+                document.getElementById('feed-b').src = result.side_b_feed + '?' + new Date().getTime();
+            }
+        };
+
+        async function stopDualSimulation() { await fetch('/api/simulation/stop', { method: 'POST' }); }
+
+        async function handleSingleUpload(files) {
+            if (!files.length) return;
+            const formData = new FormData();
+            formData.append('file', files[0]);
+            const res = await fetch('/api/upload/single', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data.status === 'ok') {
+                document.getElementById('single-result-container').style.display = 'block';
+                document.getElementById('single-result-img').src = data.result.url + '?' + new Date().getTime();
+                let counts = data.result.telemetry.counts || {};
+                let html = `<div class="telemetry-row"><span>Total Vehicles:</span><strong>${data.result.telemetry.total_vehicles || 0}</strong></div>
+                    <div class="telemetry-row"><span>Inference Latency:</span><strong>${(data.result.telemetry.inference_ms || 0).toFixed(1)} ms</strong></div>
+                    <div class="telemetry-row"><span>Emergency Ambulance:</span><strong style="color:${data.result.telemetry.has_emergency ? '#e74c3c' : '#2ecc71'}">${data.result.telemetry.has_emergency ? 'YES' : 'NO'}</strong></div>
+                    <h5 style="margin:10px 0 4px 0; color:var(--purple-main);">Vehicle Breakdown:</h5>`;
+                for (let k in counts) html += `<div class="telemetry-row"><span>${k.toUpperCase()}:</span><strong>${counts[k]}</strong></div>`;
+                document.getElementById('single-breakdown').innerHTML = html;
+            }
+        }
+
+        async function loadDatabaseLogs() {
+            const res = await fetch('/api/logs?limit=50');
+            const data = await res.json();
+            document.getElementById('stat-total-logs').innerText = data.stats.total_logs;
+            document.getElementById('stat-total-vehicles').innerText = data.stats.total_vehicles_logged;
+            document.getElementById('stat-emergency-count').innerText = data.stats.emergency_events;
+            const tbody = document.getElementById('logs-table-body');
+            tbody.innerHTML = '';
+            data.logs.forEach(log => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${log.timestamp}</td><td><strong>${log.fsm_state}</strong></td>
+                    <td style="color:${log.side_a_signal === 'GREEN' ? '#2ecc71':'#e74c3c'};">${log.side_a_signal}</td>
+                    <td style="color:${log.side_b_signal === 'GREEN' ? '#2ecc71':'#e74c3c'};">${log.side_b_signal}</td>
+                    <td>${log.side_a_count}</td><td>${log.side_b_count}</td>
+                    <td style="color:${log.emergency_flag ? '#e74c3c':'#a4b0be'};">${log.emergency_flag ? 'YES' : 'NO'}</td>
+                    <td>${log.manual_override || 'AUTO'}</td>`;
+                tbody.appendChild(row);
+            });
         }
     </script>
 </body>
 </html>
 
-    <div class="dashboard-grid">
-        <div class="card">
-            <h3>3D DIGITAL TWIN (VIT SINGLE-LANE UNDERPASS)</h3>
-            <div id="digital-twin-canvas"></div>
-        </div>
 
-        <div class="card">
-            <h3>SUPERVISORY CONTROL</h3>
-            <div class="telemetry-row">
-                <span>FSM State:</span>
-                <strong id="fsm-state" style="color: var(--accent-yellow);">INIT</strong>
-            </div>
-            <div class="telemetry-row">
-                <span>Side A Signal:</span>
-                <strong id="side-a-sig">RED</strong>
-            </div>
-            <div class="telemetry-row">
-                <span>Side B Signal:</span>
-                <strong id="side-b-sig">RED</strong>
-            </div>
-            <div class="telemetry-row">
-                <span>Elapsed State Time:</span>
-                <strong id="elapsed-time">0.0 s</strong>
-            </div>
-
-            <h4 style="margin-top:20px;">GUARD MANUAL OVERRIDES</h4>
-            <button class="btn" onclick="sendOverride('SIDE_A')">Force Side A Green</button>
-            <button class="btn" onclick="sendOverride('SIDE_B')">Force Side B Green</button>
-            <button class="btn btn-danger" onclick="sendOverride('ALL_RED')">Emergency All Red</button>
-            <button class="btn" style="background:#7f8c8d;" onclick="sendOverride('RESET')">Reset Automatic AI Mode</button>
-        </div>
-    </div>

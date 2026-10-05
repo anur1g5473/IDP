@@ -37,3 +37,7 @@ Thumbs.db
 # IDE Settings
 .vscode/
 .idea/
+# Database & Uploads
+*.db
+uploads/
+
