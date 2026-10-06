@@ -3,7 +3,7 @@ import json
 import asyncio
 import shutil
 from typing import Optional
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, UploadFile, File, Form, BackgroundTasks
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, UploadFile, File, Form, BackgroundTasks, Response
 from fastapi.responses import HTMLResponse, StreamingResponse, FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -62,8 +62,8 @@ async def websocket_telemetry(websocket: WebSocket):
                 side_a_tel = video_processor.latest_telemetry_a
                 side_b_tel = video_processor.latest_telemetry_b
             else:
-                side_a_tel = {"counts": {"car": 2, "motorcycle": 1}, "has_emergency": False, "total_vehicles": 3}
-                side_b_tel = {"counts": {"bus": 1}, "has_emergency": False, "total_vehicles": 1}
+                side_a_tel = {"counts": {"car": 2, "motorcycle": 1}, "has_emergency": False, "total_vehicles": 3, "incoming": 12, "outgoing": 9, "net_in_queue": 3}
+                side_b_tel = {"counts": {"bus": 1}, "has_emergency": False, "total_vehicles": 1, "incoming": 8, "outgoing": 7, "net_in_queue": 1}
 
             status = decision_engine.update(side_a_tel, side_b_tel)
             serial_bridge.send_state(status["fsm_state"])
@@ -127,10 +127,18 @@ async def upload_single_media(file: UploadFile = File(...)):
         }
         return JSONResponse({"status": "ok", "result": single_test_result})
     else:
+        processed_path, telemetry = video_processor.process_single_video(file_path)
+        if processed_path is None:
+            return JSONResponse({"status": "error", "message": telemetry.get("error", "Processing failed")}, status_code=400)
+        
+        rel_img_path = f"/uploads/processed/{os.path.basename(processed_path)}"
+        rel_vid_path = f"/uploads/{file.filename}"
         single_test_result = {
             "type": "video",
-            "url": f"/uploads/{file.filename}",
-            "filename": file.filename
+            "url": rel_img_path,
+            "video_url": rel_vid_path,
+            "filename": file.filename,
+            "telemetry": telemetry
         }
         return JSONResponse({"status": "ok", "result": single_test_result})
 
@@ -165,13 +173,34 @@ async def stop_simulation():
 
 @app.post("/api/override/{mode}")
 async def set_override(mode: str):
+    import time
     if mode.upper() == "RESET":
         decision_engine.manual_override = None
     elif mode.upper() in ["SIDE_A", "SIDE_B", "ALL_RED"]:
         decision_engine.manual_override = mode.upper()
+    decision_engine.state_start_time = time.time()
     return {"status": "ok", "override": decision_engine.manual_override}
+
+@app.get("/api/calibration/config")
+async def get_calibration_config():
+    return JSONResponse(detector.config)
+
+@app.post("/api/calibration/config")
+async def update_calibration_config(request: Request):
+    try:
+        new_config = await request.json()
+        detector.update_config(new_config)
+        return JSONResponse({"status": "ok", "message": "Calibration updated successfully."})
+    except Exception as e:
+        return JSONResponse({"status": "error", "message": str(e)}, status_code=400)
+
+@app.get("/api/calibration/snapshot/{side}")
+async def get_calibration_snapshot(side: str):
+    jpeg_bytes = video_processor.get_snapshot_jpeg(side)
+    if not jpeg_bytes:
+        return JSONResponse({"status": "error", "message": "No frame snapshot available"}, status_code=404)
+    return Response(content=jpeg_bytes, media_type="image/jpeg")
 
 @app.get("/api/logs")
 async def get_logs(limit: int = 50):
     return JSONResponse({"logs": get_recent_logs(limit), "stats": get_db_stats()})
-

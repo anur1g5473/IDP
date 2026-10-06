@@ -1,7 +1,6 @@
 import React from 'react';
 
-export default function SignalWidget({ sideName, signalColor, vehicleCount }) {
-  // signalColor will be 'RED', 'AMBER', or 'GREEN'
+export default function SignalWidget({ sideName, signalColor, vehicleCount, incomingCount = 0, outgoingCount = 0 }) {
   const isRed = signalColor === 'RED';
   const isAmber = signalColor === 'AMBER' || signalColor === 'YELLOW';
   const isGreen = signalColor === 'GREEN';
@@ -17,15 +16,19 @@ export default function SignalWidget({ sideName, signalColor, vehicleCount }) {
       justifyContent: 'space-between',
       gap: '12px'
     }}>
-      <div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
         <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
           SIGNAL MONITOR
         </div>
         <div style={{ fontWeight: 'bold', fontSize: '0.95rem', color: 'var(--text-main)' }}>
           {sideName}
         </div>
-        <div style={{ fontSize: '0.8rem', color: 'var(--text-sub)', marginTop: '4px' }}>
-          Vehicles: <strong style={{ color: 'var(--mint-mist)' }}>{vehicleCount}</strong>
+        <div style={{ fontSize: '0.75rem', color: 'var(--text-sub)', display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '2px' }}>
+          <span>Queue: <strong style={{ color: 'var(--mint-mist)' }}>{vehicleCount}</strong></span>
+          <span style={{ color: 'var(--royal-plum-light)' }}>|</span>
+          <span style={{ color: '#00FFFF' }}>IN: <strong>{incomingCount}</strong></span>
+          <span style={{ color: 'var(--royal-plum-light)' }}>|</span>
+          <span style={{ color: '#FFA500' }}>OUT: <strong>{outgoingCount}</strong></span>
         </div>
       </div>
 

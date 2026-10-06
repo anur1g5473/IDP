@@ -5,12 +5,12 @@ export default function FsmFlowWidget({ currentFsmState, elapsedTime }) {
   const states = [
     { id: 'INIT', label: 'INIT' },
     { id: 'SIDE_A_GREEN', label: 'SIDE A GREEN' },
-    { id: 'SIDE_A_CLEAR', label: 'CLEAR A' },
+    { id: 'ALL_RED_CLEARANCE_A_TO_B', label: 'CLEAR A→B' },
     { id: 'SIDE_B_GREEN', label: 'SIDE B GREEN' },
-    { id: 'SIDE_B_CLEAR', label: 'CLEAR B' },
+    { id: 'ALL_RED_CLEARANCE_B_TO_A', label: 'CLEAR B→A' },
   ];
 
-  const isEmergency = currentFsmState === 'EMERGENCY_ALL_RED';
+  const isEmergency = currentFsmState === 'EMERGENCY_ALL_RED' || currentFsmState === 'ALL_RED';
 
   return (
     <div style={{

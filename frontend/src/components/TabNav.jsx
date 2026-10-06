@@ -1,10 +1,11 @@
 import React from 'react';
-import { Monitor, FileSearch, Database } from 'lucide-react';
+import { Monitor, FileSearch, Database, Sliders } from 'lucide-react';
 
 export default function TabNav({ activeTab, setActiveTab }) {
   const tabs = [
     { id: 'tab-live', label: 'Dual Live & 3D Twin', icon: Monitor },
     { id: 'tab-single', label: 'Single Media Test', icon: FileSearch },
+    { id: 'tab-calibration', label: 'Road Calibration & AI Studio', icon: Sliders },
     { id: 'tab-db', label: 'Database Logs', icon: Database }
   ];
 

@@ -3,6 +3,23 @@ import * as THREE from 'three';
 
 export default function DigitalTwin3D({ signalA, signalB, countA, countB }) {
   const containerRef = useRef(null);
+  const sigMatARef = useRef(null);
+  const sigMatBRef = useRef(null);
+
+  const getSignalColorHex = (sig) => {
+    if (sig === 'GREEN') return 0x34C759;
+    if (sig === 'AMBER' || sig === 'YELLOW') return 0xFFCC00;
+    return 0xFF3B30; // RED
+  };
+
+  useEffect(() => {
+    if (sigMatARef.current) {
+      sigMatARef.current.color.setHex(getSignalColorHex(signalA));
+    }
+    if (sigMatBRef.current) {
+      sigMatBRef.current.color.setHex(getSignalColorHex(signalB));
+    }
+  }, [signalA, signalB]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -40,12 +57,14 @@ export default function DigitalTwin3D({ signalA, signalB, countA, countB }) {
     scene.add(wallRight);
 
     // Signal Lamps Spheres
-    const sigMatA = new THREE.MeshBasicMaterial({ color: 0xFF3B30 });
+    const sigMatA = new THREE.MeshBasicMaterial({ color: getSignalColorHex(signalA) });
+    sigMatARef.current = sigMatA;
     const signalMeshA = new THREE.Mesh(new THREE.SphereGeometry(1.4, 16, 16), sigMatA);
     signalMeshA.position.set(-5.5, 4, -18);
     scene.add(signalMeshA);
 
-    const sigMatB = new THREE.MeshBasicMaterial({ color: 0xFF3B30 });
+    const sigMatB = new THREE.MeshBasicMaterial({ color: getSignalColorHex(signalB) });
+    sigMatBRef.current = sigMatB;
     const signalMeshB = new THREE.Mesh(new THREE.SphereGeometry(1.4, 16, 16), sigMatB);
     signalMeshB.position.set(5.5, 4, 18);
     scene.add(signalMeshB);

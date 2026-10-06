@@ -76,10 +76,25 @@ export default function TabSingleMedia() {
           )}
 
           {result && !loading && (
-            <div style={{ marginTop: '16px' }}>
-              <div style={{ backgroundColor: '#000', border: '2px solid var(--royal-plum)', boxShadow: '4px 4px 0px #000', overflow: 'hidden' }}>
-                <img src={result.url + '?' + new Date().getTime()} alt="YOLO Detection Result" style={{ width: '100%', display: 'block' }} />
+            <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-sub)', fontFamily: 'var(--font-mono)', marginBottom: '4px' }}>
+                  YOLO ANNOTATED DETECTION FRAME
+                </div>
+                <div style={{ backgroundColor: '#000', border: '2px solid var(--royal-plum)', boxShadow: '4px 4px 0px #000', overflow: 'hidden' }}>
+                  <img src={result.url + '?' + new Date().getTime()} alt="YOLO Detection Result" style={{ width: '100%', display: 'block' }} />
+                </div>
               </div>
+              {result.type === 'video' && result.video_url && (
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-sub)', fontFamily: 'var(--font-mono)', marginBottom: '4px' }}>
+                    SOURCE VIDEO PLAYBACK
+                  </div>
+                  <div style={{ backgroundColor: '#000', border: '2px solid var(--royal-plum)', boxShadow: '4px 4px 0px #000', overflow: 'hidden' }}>
+                    <video src={result.video_url} controls style={{ width: '100%', display: 'block', maxHeight: '300px' }} />
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

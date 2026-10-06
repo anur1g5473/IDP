@@ -1,0 +1,45 @@
+{
+  "model": {
+    "weights": "yolo11n.pt",
+    "conf_thresh": 0.40,
+    "iou_thresh": 0.45,
+    "imgsz": 640,
+    "tracker": "bytetrack.yaml",
+    "enable_tracking": true,
+    "active_classes": ["car", "motorcycle", "bicycle", "bus", "truck", "auto_rickshaw", "ambulance", "person"]
+  },
+  "side_a": {
+    "roi_polygon": [
+      [0.05, 0.15],
+      [0.95, 0.15],
+      [0.95, 0.95],
+      [0.05, 0.95]
+    ],
+    "incoming_line": [
+      [0.10, 0.40],
+      [0.90, 0.40]
+    ],
+    "outgoing_line": [
+      [0.10, 0.75],
+      [0.90, 0.75]
+    ],
+    "incoming_direction": "TOP_TO_BOTTOM"
+  },
+  "side_b": {
+    "roi_polygon": [
+      [0.05, 0.15],
+      [0.95, 0.15],
+      [0.95, 0.95],
+      [0.05, 0.95]
+    ],
+    "incoming_line": [
+      [0.10, 0.40],
+      [0.90, 0.40]
+    ],
+    "outgoing_line": [
+      [0.10, 0.75],
+      [0.90, 0.75]
+    ],
+    "incoming_direction": "TOP_TO_BOTTOM"
+  }
+}

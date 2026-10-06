@@ -94,6 +94,9 @@ class TrafficDecisionEngine:
             "fsm_state": self.current_state.value,
             "side_a_signal": side_a_signal,
             "side_b_signal": side_b_signal,
+            "signal_side_a": side_a_signal,
+            "signal_side_b": side_b_signal,
             "elapsed_seconds": elapsed,
+            "emergency_active": self.manual_override == "ALL_RED",
             "manual_override": self.manual_override
         }

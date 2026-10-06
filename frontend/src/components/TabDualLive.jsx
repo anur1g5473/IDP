@@ -111,8 +111,8 @@ export default function TabDualLive({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {/* Signal Monitors */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <SignalWidget sideName="SIDE A (WEST)" signalColor={sigAColor} vehicleCount={sideA.total_vehicles || 0} />
-            <SignalWidget sideName="SIDE B (EAST)" signalColor={sigBColor} vehicleCount={sideB.total_vehicles || 0} />
+            <SignalWidget sideName="SIDE A (WEST)" signalColor={sigAColor} vehicleCount={sideA.total_vehicles || 0} incomingCount={sideA.incoming || 0} outgoingCount={sideA.outgoing || 0} />
+            <SignalWidget sideName="SIDE B (EAST)" signalColor={sigBColor} vehicleCount={sideB.total_vehicles || 0} incomingCount={sideB.incoming || 0} outgoingCount={sideB.outgoing || 0} />
           </div>
 
           {/* FSM Decision Engine Card */}
@@ -126,12 +126,16 @@ export default function TabDualLive({
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px', fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                <span>Side A Vehicle Count:</span>
-                <strong style={{ color: 'var(--mint-mist)' }}>{sideA.total_vehicles || 0}</strong>
+                <span>Side A Traffic (Queue / IN / OUT):</span>
+                <strong style={{ color: 'var(--mint-mist)' }}>
+                  {sideA.total_vehicles || 0} queue | <span style={{ color: '#00FFFF' }}>{sideA.incoming || 0} IN</span> | <span style={{ color: '#FFA500' }}>{sideA.outgoing || 0} OUT</span>
+                </strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                <span>Side B Vehicle Count:</span>
-                <strong style={{ color: 'var(--mint-mist)' }}>{sideB.total_vehicles || 0}</strong>
+                <span>Side B Traffic (Queue / IN / OUT):</span>
+                <strong style={{ color: 'var(--mint-mist)' }}>
+                  {sideB.total_vehicles || 0} queue | <span style={{ color: '#00FFFF' }}>{sideB.incoming || 0} IN</span> | <span style={{ color: '#FFA500' }}>{sideB.outgoing || 0} OUT</span>
+                </strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
                 <span>Active Manual Override:</span>

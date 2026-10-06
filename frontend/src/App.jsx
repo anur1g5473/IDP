@@ -3,6 +3,7 @@ import Header from './components/Header';
 import TabNav from './components/TabNav';
 import TabDualLive from './components/TabDualLive';
 import TabSingleMedia from './components/TabSingleMedia';
+import TabCalibration from './components/TabCalibration';
 import TabDatabaseLogs from './components/TabDatabaseLogs';
 import Background3D from './components/Background3D';
 import ConfirmModal from './components/ConfirmModal';
@@ -106,6 +107,8 @@ export default function App() {
         )}
 
         {activeTab === 'tab-single' && <TabSingleMedia />}
+
+        {activeTab === 'tab-calibration' && <TabCalibration />}
 
         {activeTab === 'tab-db' && <TabDatabaseLogs />}
       </main>
